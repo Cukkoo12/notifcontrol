@@ -31,6 +31,13 @@ public class NotifControlMod {
         // RegisterKeyMappingsEvent is a MOD bus event — must be added via addListener.
         // It only fires on CLIENT, so KeyMapping is never touched on server.
         modEventBus.addListener(NotifControlMod::onRegisterKeyMappings);
+
+        // Register config screen for NeoForge Mods list (client-only)
+        container.registerExtensionPoint(
+                net.neoforged.neoforge.client.gui.IConfigScreenFactory.class,
+                (mc, screen) -> new com.cukkoo.notifcontrol.modmenu.NotifControlScreen(screen)
+        );
+
         LOGGER.info("[NotifControl] Initialized (NeoForge 26.1.x). Config loaded from config/notifcontrol.json");
     }
 
