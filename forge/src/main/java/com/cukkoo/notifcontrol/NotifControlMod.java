@@ -4,13 +4,12 @@ import com.cukkoo.notifcontrol.modmenu.NotificationCenterScreen;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.api.distmarker.Dist;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,35 +20,39 @@ public class NotifControlMod {
     public static final String MOD_ID = "notifcontrol";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
+    // Populated during RegisterKeyMappingsEvent (client-only event, safe)
     public static KeyMapping toggleKey;
     public static KeyMapping historyKey;
 
     public NotifControlMod() {
         NotifControlConfig.load();
-
-        toggleKey = new KeyMapping(
-                "key.notifcontrol.toggle",
-                GLFW.GLFW_KEY_UNKNOWN,
-                KeyMapping.Category.MISC
-        );
-        historyKey = new KeyMapping(
-                "key.notifcontrol.history",
-                GLFW.GLFW_KEY_H,
-                KeyMapping.Category.MISC
-        );
-
         LOGGER.info("[NotifControl] Initialized (Forge 26.1.x). Config loaded from config/notifcontrol.json");
     }
 
-    // Note: Forge 26.1 @Mod.EventBusSubscriber: bus attribute removed
-    @Mod.EventBusSubscriber(modid = MOD_ID, value = Dist.CLIENT)
-    public static class ClientEventHandler {
+    // MOD bus — client-only events like RegisterKeyMappingsEvent
+    @Mod.EventBusSubscriber(modid = MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
+    public static class ClientModEvents {
 
         @SubscribeEvent
         public static void onRegisterKeyMappings(RegisterKeyMappingsEvent event) {
+            toggleKey = new KeyMapping(
+                    "key.notifcontrol.toggle",
+                    GLFW.GLFW_KEY_UNKNOWN,
+                    KeyMapping.Category.MISC
+            );
+            historyKey = new KeyMapping(
+                    "key.notifcontrol.history",
+                    GLFW.GLFW_KEY_H,
+                    KeyMapping.Category.MISC
+            );
             event.register(toggleKey);
             event.register(historyKey);
         }
+    }
+
+    // FORGE (game) bus — client tick and commands
+    @Mod.EventBusSubscriber(modid = MOD_ID, value = Dist.CLIENT)
+    public static class ClientGameEvents {
 
         @SubscribeEvent
         public static void onClientTick(TickEvent.ClientTickEvent.Post event) {
@@ -57,7 +60,7 @@ public class NotifControlMod {
             if (client.level == null) return;
             NotifControlConfig cfg = NotifControlConfig.get();
 
-            if (cfg.globalToggleKey >= 0 && toggleKey.consumeClick()) {
+            if (cfg.globalToggleKey >= 0 && toggleKey != null && toggleKey.consumeClick()) {
                 boolean allOff = !cfg.recipe.enabled
                         && !cfg.advancement.enabled
                         && !cfg.tutorial.enabled
@@ -74,7 +77,7 @@ public class NotifControlMod {
                 NotifControlConfig.save();
             }
 
-            if (historyKey.consumeClick()) {
+            if (historyKey != null && historyKey.consumeClick()) {
                 client.setScreen(new NotificationCenterScreen(client.screen));
             }
         }

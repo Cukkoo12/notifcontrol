@@ -4,6 +4,7 @@ import com.cukkoo.notifcontrol.modmenu.NotificationCenterScreen;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
@@ -11,7 +12,6 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
-import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
@@ -28,7 +28,13 @@ public class NotifControlMod {
 
     public NotifControlMod(IEventBus modEventBus, ModContainer container) {
         NotifControlConfig.load();
+        // RegisterKeyMappingsEvent is a MOD bus event — must be added via addListener.
+        // It only fires on CLIENT, so KeyMapping is never touched on server.
+        modEventBus.addListener(NotifControlMod::onRegisterKeyMappings);
+        LOGGER.info("[NotifControl] Initialized (NeoForge 26.1.x). Config loaded from config/notifcontrol.json");
+    }
 
+    private static void onRegisterKeyMappings(RegisterKeyMappingsEvent event) {
         toggleKey = new KeyMapping(
                 "key.notifcontrol.toggle",
                 GLFW.GLFW_KEY_UNKNOWN,
@@ -39,21 +45,13 @@ public class NotifControlMod {
                 GLFW.GLFW_KEY_H,
                 KeyMapping.Category.MISC
         );
-
-        modEventBus.addListener(this::onRegisterKeyMappings);
-        NeoForge.EVENT_BUS.register(ClientEventHandler.class);
-
-        LOGGER.info("[NotifControl] Initialized (NeoForge 26.1.x). Config loaded from config/notifcontrol.json");
-    }
-
-    private void onRegisterKeyMappings(RegisterKeyMappingsEvent event) {
         event.register(toggleKey);
         event.register(historyKey);
     }
 
-    // Note: @EventBusSubscriber on NeoForge 26.1.x: bus attribute removed, only modid needed
-    @EventBusSubscriber(modid = MOD_ID)
-    public static class ClientEventHandler {
+    // GAME bus, client-only events (NeoForge 26.1.x: no bus attribute)
+    @EventBusSubscriber(modid = MOD_ID, value = Dist.CLIENT)
+    public static class ClientGameEvents {
 
         @SubscribeEvent
         public static void onClientTickPost(ClientTickEvent.Post event) {
@@ -61,7 +59,7 @@ public class NotifControlMod {
             if (client.level == null) return;
             NotifControlConfig cfg = NotifControlConfig.get();
 
-            if (cfg.globalToggleKey >= 0 && toggleKey.consumeClick()) {
+            if (cfg.globalToggleKey >= 0 && toggleKey != null && toggleKey.consumeClick()) {
                 boolean allOff = !cfg.recipe.enabled
                         && !cfg.advancement.enabled
                         && !cfg.tutorial.enabled
@@ -78,7 +76,7 @@ public class NotifControlMod {
                 NotifControlConfig.save();
             }
 
-            if (historyKey.consumeClick()) {
+            if (historyKey != null && historyKey.consumeClick()) {
                 client.setScreen(new NotificationCenterScreen(client.screen));
             }
         }
