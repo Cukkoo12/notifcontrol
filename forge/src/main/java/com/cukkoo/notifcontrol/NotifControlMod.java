@@ -30,12 +30,12 @@ public class NotifControlMod {
         toggleKey = new KeyMapping(
                 "key.notifcontrol.toggle",
                 GLFW.GLFW_KEY_UNKNOWN,
-                "key.categories.misc"
+                KeyMapping.Category.MISC
         );
         historyKey = new KeyMapping(
                 "key.notifcontrol.history",
                 GLFW.GLFW_KEY_H,
-                "key.categories.misc"
+                KeyMapping.Category.MISC
         );
 
         LOGGER.info("[NotifControl] Initialized (Forge 26.1.x). Config loaded from config/notifcontrol.json");
