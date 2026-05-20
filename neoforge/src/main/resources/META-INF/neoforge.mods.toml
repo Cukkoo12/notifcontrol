@@ -1,0 +1,28 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="MIT"
+
+[[mods]]
+    modId="notifcontrol"
+    version="${file.jarVersion}"
+    displayName="NotifControl"
+    description="Full control over toast notifications: filter, reposition, scale, and more."
+    logoFile="icon.png"
+    authors="Cukkoo12"
+
+[[mixins]]
+    config="notifcontrol.mixins.json"
+
+[[dependencies.notifcontrol]]
+    modId="neoforge"
+    type="required"
+    versionRange="[26,)"
+    ordering="NONE"
+    side="CLIENT"
+
+[[dependencies.notifcontrol]]
+    modId="minecraft"
+    type="required"
+    versionRange="[26.1,)"
+    ordering="NONE"
+    side="CLIENT"

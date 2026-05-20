@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "com.cukkoo.notifcontrol.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "client": [
+    "AdvancementToastAccessor",
+    "NotifControlMixin",
+    "ToastInstanceMixin",
+    "ToastManagerMixin",
+    "ChatComponentMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

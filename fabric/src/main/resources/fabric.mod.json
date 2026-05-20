@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "notifcontrol",
+  "version": "${version}",
+  "name": "NotifControl",
+  "description": "Full control over toast notifications: filter, reposition, scale, and more.",
+  "authors": ["Cukkoo"],
+  "contact": {
+    "sources": "https://github.com/Cukkoo12/notifcontrol"
+  },
+  "license": "MIT",
+  "icon": "icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["com.cukkoo.notifcontrol.NotifControlMod"],
+    "modmenu": ["com.cukkoo.notifcontrol.modmenu.NotifControlModMenuEntry"]
+  },
+  "mixins": ["notifcontrol.mixins.json"],
+  "depends": {
+    "fabricloader": ">=0.18.5",
+    "fabric-api": ">=0.145.4",
+    "minecraft": ">=26.1.0",
+    "java": ">=25"
+  },
+  "suggests": {
+    "modmenu": "*"
+  }
+}

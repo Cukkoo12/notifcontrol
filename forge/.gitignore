@@ -1,0 +1,21 @@
+# Gradle
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Minecraft development and runs
+run/
+.gradle/
+*.log
+.settings/
+
+# IDEs
+.idea/
+*.iml
+.classpath
+.project
+.factorypath
+
+# OS files
+Thumbs.db
+.DS_Store

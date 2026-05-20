@@ -1,0 +1,28 @@
+# Build outputs
+fabric/build/
+neoforge/build/
+forge/build/
+
+# Gradle
+fabric/.gradle/
+neoforge/.gradle/
+forge/.gradle/
+.gradle/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Run dirs
+fabric/run/
+neoforge/run/
+forge/run/
+
+# CLAUDE docs (contain tokens)
+CLAUDE.md
+CLAUDE-*.md
+
+# OS
+.DS_Store
+Thumbs.db
